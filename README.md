@@ -4,7 +4,7 @@
 
 **Built with PriorLabs-TabPFN**
 
-Public inference implementation: **TabPFN-FICER-Surv**, using the frozen **TabPFN-3** backbone. FICER-Surv is the paper and framework name; the implementation identifier carries the TabPFN prefix specified in the dependency's additional attribution provision.
+**Implementation:** TabPFN-FICER-Surv · **Backbone:** frozen TabPFN-3.
 
 FICER-Surv predicts cancer survival risk from gene-level molecular profiles. Group-aware survival screening (GSS) selects outcome-relevant features within six functional groups. Core-anchored graph refinement (CAGR) preserves strong screening evidence and refines the remaining selection. Time-conditioned survival inference (TCSI) uses the selected measurements and observable patient–time labels to condition a frozen TabPFN-3 classifier.
 
@@ -20,7 +20,7 @@ Accurate cancer survival prediction benefits from tumor molecular profiles, incl
 
 ## Installation
 
-The implementation is tested with Python 3.12, PyTorch 2.7.1 with CUDA 12.8, and TabPFN 8.2.0. An NVIDIA GPU is recommended. CPU inference is supported but slower.
+The implementation is tested with Python 3.12, PyTorch 2.7.1 with CUDA 12.8, and TabPFN 8.2.0.
 
 ```bash
 conda create -n ficer-surv python=3.12 -y
@@ -66,114 +66,42 @@ python main.py --dataset blca --fold all
 python main.py --dataset gbmlgg --fold all
 ```
 
-Change the feature budget, model seed, or core fraction:
-
-```bash
-python main.py --dataset luad --fold all --num-features 300 --seed 7 --output outputs/luad_run
-python main.py --dataset luad --fold 0 --core-fraction 0.9 --device cuda --output outputs/luad_core09
-```
+`main.py` is the entry point; configuration is provided in `options.json`.
 
 Each held-out fold produces `predictions.csv`, `features.csv`, and `metrics.json`. A cohort-level `summary.json` contains the mean C-index and sample standard deviation across the requested folds. Existing fold outputs are not overwritten; use a different `--output` directory for another run.
 
-## Options
-
-`main.py` is the only command-line entry point. All model parameters and dataset paths are in `options.json`.
-
-| Option | Meaning | Default |
-|---|---|---|
-| `num_features` | Total molecular feature budget | 300 |
-| `seed` | TabPFN seed and fold-generation seed for custom data | 7 |
-| `core_fraction` | Core fraction for custom data or an explicit override | 0.9 |
-| `datasets.*.core_fractions` | Fixed core fraction for each provided fold | Per-cohort list |
-| `num_bins` | Number of time intervals; the default gives up to four query horizons | 5 |
-| `pool_multiplier` | Expanded candidate budget within a group | 1.5 |
-| `elastic_net` | Cox regularization path and coefficient threshold | See JSON |
-| `graph` | Neighbor count, correlation threshold, and smoothing strength | 8, 0.3, 0.2 |
-| `n_estimators` | TabPFN ensemble size before automatic scaling | 8 |
-| `device` | `auto`, `cuda`, or `cpu` | `auto` |
-| `checkpoint` | Local TabPFN-3 checkpoint, or automatic download | `null` |
-
-Command-line arguments override the corresponding JSON values. The provided cohorts use their existing patient folds and the per-fold core fractions listed in the configuration. `--core-fraction` overrides those lists.
-
 ## CSV data
 
-The `data` directory contains the four molecular candidate tables and the functional gene signatures. Each cohort CSV contains all signature-matched candidate measurements. GSS and CAGR select the input features during fitting.
+The cohort data and functional gene lists are adopted from the resources released with [MCAT](https://github.com/mahmoodlab/MCAT), with the original patient data originating from [The Cancer Genome Atlas](https://www.cancer.gov/ccg/research/genome-sequencing/tcga). The CSVs in `data/` are adapted from these existing resources for use with FICER-Surv; they are not a newly collected dataset.
 
-| File | Cohort | Patients | Events | Candidate features |
-|---|---|---:|---:|---:|
-| `ucec.csv` | Uterine Corpus Endometrial Carcinoma | 480 | 75 | 1589 |
-| `luad.csv` | Lung Adenocarcinoma | 453 | 158 | 3229 |
-| `blca.csv` | Bladder Urothelial Carcinoma | 373 | 169 | 3156 |
-| `gbmlgg.csv` | Glioblastoma & Lower Grade Glioma | 568 | 187 | 2461 |
-
-Each row is one patient. The required columns are:
-
-| Column | Meaning |
-|---|---|
-| `case_id` | Unique patient identifier |
-| `survival_months` | Observed follow-up time in months |
-| `event` | 1 for an observed event; 0 for right censoring |
-| `fold` | Held-out fold index, 0–4 for the provided cohorts |
-| Molecular columns | Numeric measurements; missing values are allowed |
-
-`event` is the inverse of the `censorship` field in the source TCGA tables. IDs, outcomes, and fold assignments are excluded from molecular predictors. Molecular values are retained without cohort-wide imputation or standardization. Screening statistics, correlations, and time grids are estimated from the training patients of each fold.
-
-`signatures.csv` defines six groups in priority order: tumor suppressor genes, oncogenes, protein kinases, cell differentiation markers, transcription factors, and cytokines and growth factors. A feature is assigned to its first matching group. Feature names may be gene symbols or use the suffixes `_rnaseq`, `_cnv`, and `_mut`.
-
-For another cohort, use the same CSV schema and edit the column names in `options.json` if needed:
-
-```bash
-python main.py --data /path/to/cohort.csv --fold all --core-fraction 0.9 --output outputs/custom
-```
-
-If `fold` is absent, the runner constructs event-stratified folds using `num_folds` and `seed`. New gene groups can be supplied by changing `signatures` to another CSV with one gene list per column.
-
-## Paper results
-
-Five-fold mean C-index at a 300-feature budget:
-
-| UCEC | LUAD | BLCA | GBMLGG | Overall |
-|---:|---:|---:|---:|---:|
-| 0.6403 | 0.6416 | 0.6677 | 0.8563 | 0.7015 |
-
-Overall is the unweighted mean of the four cohort means. Cohort means use all five held-out folds; running all four cohorts gives the overall score.
-
-![Risk-stratified Kaplan–Meier curves from the paper](assets/survival.png)
+| File | Cohort | Patients |
+|---|---|---:|
+| `ucec.csv` | Uterine Corpus Endometrial Carcinoma | 480 |
+| `luad.csv` | Lung Adenocarcinoma | 453 |
+| `blca.csv` | Bladder Urothelial Carcinoma | 373 |
+| `gbmlgg.csv` | Glioblastoma & Lower Grade Glioma | 568 |
 
 ## Files
 
 ```text
 FICER-Surv/
-  main.py
-  options.json
-  requirements.txt
-  README.md
-  NOTICE
-  THIRD_PARTY_NOTICES.md
-  ficer_surv/
-    __init__.py
-    model.py
-    gss.py
-    cagr.py
-    tcsi.py
-    data.py
-  licenses/
-    TabPFN-8.2.0-LICENSE.txt
-    TabPFN-3-LICENSE.txt
-    MCAT-LICENSE.txt
-  data/
-    signatures.csv
-    ucec.csv
-    luad.csv
-    blca.csv
-    gbmlgg.csv
-  assets/
-    motivation.png
-    framework.png
-    survival.png
+├── main.py             # Command-line entry point
+├── options.json        # Configuration
+├── requirements.txt
+├── README.md
+├── ficer_surv/
+│   ├── __init__.py
+│   ├── model.py        # FICER-Surv model composition and interface
+│   ├── gss.py          # Functional groups, budgets, and EN-Cox screening
+│   ├── cagr.py         # Correlation graphs, importance propagation, and core protection
+│   ├── tcsi.py         # Survival contexts, TabPFN inference, and risk recovery
+│   └── data.py         # CSV loading, validation, and patient folds
+├── data/
+├── assets/
+└── licenses/
 ```
 
-`model.py` combines the stages; `gss.py` implements group-aware screening and feature budgets; `cagr.py` implements correlation graphs and core-preserving refinement; `tcsi.py` constructs observable patient–time contexts, calls the official frozen TabPFN implementation, and recovers survival curves and risks. `data.py` reads and validates CSVs and their patient folds. Public model access is `from ficer_surv import FICERSurv`; the command-line entry remains `main.py`.
+The model interface is available through `from ficer_surv import FICERSurv`.
 
 ## Acknowledgments
 
