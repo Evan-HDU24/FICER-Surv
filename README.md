@@ -68,11 +68,9 @@ python main.py --dataset gbmlgg --fold all
 
 `main.py` is the entry point; configuration is provided in `options.json`.
 
-Each held-out fold produces `predictions.csv`, `features.csv`, and `metrics.json`. A cohort-level `summary.json` contains the mean C-index and sample standard deviation across the requested folds. Existing fold outputs are not overwritten; use a different `--output` directory for another run.
-
 ## CSV data
 
-The cohort data and functional gene lists are adopted from the resources released with [MCAT](https://github.com/mahmoodlab/MCAT), with the original patient data originating from [The Cancer Genome Atlas](https://www.cancer.gov/ccg/research/genome-sequencing/tcga). The CSVs in `data/` are adapted from these existing resources for use with FICER-Surv; they are not a newly collected dataset.
+The cohort data and functional gene lists are adopted from the resources released with [MCAT](https://github.com/mahmoodlab/MCAT), with the original patient data originating from [The Cancer Genome Atlas](https://www.cancer.gov/ccg/research/genome-sequencing/tcga).
 
 | File | Cohort | Patients |
 |---|---|---:|
