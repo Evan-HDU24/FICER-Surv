@@ -1,0 +1,41 @@
+FICER-Surv
+Public inference implementation: TabPFN-FICER-Surv
+Built with PriorLabs-TabPFN
+
+FICER-Surv uses the official TabPFN 8.2.0 implementation through an installed
+Python dependency. TabPFNClassifier and ModelVersion.V3 in ficer_surv/tcsi.py
+are provided by Prior Labs and the TabPFN contributors. Their implementation
+is used for frozen tabular inference. The TabPFN source tree and pretrained
+weights are not distributed in this repository. FICER-Surv adds molecular
+evidence construction and a task-specific survival interface; it does not
+modify or retrain the upstream TabPFN backbone or its pretrained weights.
+
+The TabPFN 8.2.0 code license is reproduced without alteration in
+licenses/TabPFN-8.2.0-LICENSE.txt. The TabPFN-3 model license is reproduced
+without alteration in licenses/TabPFN-3-LICENSE.txt.
+
+The TABPFN-3 Model is licensed by Prior Labs GmbH under the TABPFN-3
+Non-Commercial License.
+Copyright © Prior Labs GmbH 2026.
+THE SERVICES ARE PROVIDED FREE OF CHARGE: COMPANY SHALL NOT BE LIABLE FOR
+DAMAGES RESULTING FROM SLIGHT NEGLIGENCE. LIABILITY FOR GROSS NEGLIGENCE
+AND INTENTIONAL MISCONDUCT REMAINS UNAFFECTED.
+
+Any rights to use the TABPFN-3 Model are granted directly by Prior Labs
+under its license, not by the FICER-Surv authors. Users must obtain model
+access through an authorized route and comply with the applicable terms.
+
+The cumulative-event survival formulation follows Da In Kim, Wei Siang Lai,
+and Kelly W. Zhang, "Tabular Foundation Models Can Do Survival Analysis,"
+2026, https://arxiv.org/abs/2601.22259.
+
+The functional gene lists in data/signatures.csv originate from the MCAT
+project by Chen et al., ICCV 2021, https://github.com/mahmoodlab/MCAT.
+They are retained without modification. A copy of the upstream repository's
+GPL-3.0 license is provided in licenses/MCAT-LICENSE.txt. TCGA data retain
+their applicable source terms; this notice does not relicense those data.
+
+FICER-Surv is an independent academic research project. It is not an official
+Prior Labs product and is not endorsed, approved, or validated by Prior Labs
+or the other upstream projects. This notice records attribution and does
+not replace or expand any upstream license.

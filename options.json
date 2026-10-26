@@ -1,0 +1,52 @@
+{
+  "id_column": "case_id",
+  "time_column": "survival_months",
+  "event_column": "event",
+  "fold_column": "fold",
+  "signatures": "data/signatures.csv",
+  "output_dir": "outputs",
+  "num_features": 300,
+  "core_fraction": 0.9,
+  "seed": 7,
+  "num_folds": 5,
+  "device": "auto",
+  "checkpoint": null,
+  "threads": 8,
+  "selector_threads": 3,
+  "num_bins": 5,
+  "max_context_rows": 10000,
+  "n_estimators": 8,
+  "auto_scale_n_estimators": true,
+  "pool_multiplier": 1.5,
+  "elastic_net": {
+    "l1_ratio": 0.5,
+    "n_alphas": 80,
+    "alpha_min_ratio": 0.0001,
+    "max_iter": 100000,
+    "tolerance": 1e-7,
+    "coefficient_threshold": 1e-8
+  },
+  "graph": {
+    "neighbors": 8,
+    "correlation_threshold": 0.3,
+    "regularization": 0.2
+  },
+  "datasets": {
+    "ucec": {
+      "csv": "data/ucec.csv",
+      "core_fractions": [0.9, 0.75, 0.9, 0.9, 0.9]
+    },
+    "luad": {
+      "csv": "data/luad.csv",
+      "core_fractions": [0.75, 0.75, 0.9, 0.9, 0.9]
+    },
+    "blca": {
+      "csv": "data/blca.csv",
+      "core_fractions": [0.9, 0.75, 0.9, 0.9, 0.9]
+    },
+    "gbmlgg": {
+      "csv": "data/gbmlgg.csv",
+      "core_fractions": [0.75, 0.75, 0.75, 0.9, 0.75]
+    }
+  }
+}

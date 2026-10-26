@@ -1,0 +1,8 @@
+numpy==1.26.4
+pandas==2.3.1
+scipy==1.16.0
+scikit-learn==1.6.1
+scikit-survival==0.24.1
+tabpfn==8.2.0
+torch==2.7.1
+threadpoolctl==3.6.0
